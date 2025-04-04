@@ -45,7 +45,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <AppointmentList
           data={appointments}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+          renderItem={( {item} ) => (
             <AppointmentCard>
               <DoctorImage source={{ uri: item.doctor.image }} />
               <InfoContainer>

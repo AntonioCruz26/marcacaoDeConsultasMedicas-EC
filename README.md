@@ -9,7 +9,6 @@ Feito por: Antonio Luiz D' Antonia da Cruz - RM: 551364
 
 ## Dependencias que devem ser baixadas
 - npm install -g expo-cli
-  - expo --version
 - npx expo install react-dom react-native-web @expo/metro-runtime
 - npm install styled-components @types/styled-components @types/styled-components-react-native
 - npm install @react-navigation/native @react-navigation/stack react-native-screens react-native-safe-area-context react-native-gesture-handler
@@ -18,3 +17,4 @@ Feito por: Antonio Luiz D' Antonia da Cruz - RM: 551364
 - npm install --save-dev @types/react-native-elements
 - npm install @react-navigation/native-stack
 - npm install @react-native-async-storage/async-storage @react-native-community/datetimepicker
+- npm install @react-native-community/netinfo

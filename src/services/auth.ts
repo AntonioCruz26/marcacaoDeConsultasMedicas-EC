@@ -166,4 +166,4 @@ export const authService = {
       console.error('Erro ao carregar usuários registrados:', error);
     }
   },
-};
+}; 

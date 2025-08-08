@@ -1,4 +1,8 @@
 /**
+ * Tipos relacionados à autenticação e autorização
+ */
+
+/**
  * Perfis de usuário disponíveis no sistema
  */
 export type UserRole = 'admin' | 'doctor' | 'patient';

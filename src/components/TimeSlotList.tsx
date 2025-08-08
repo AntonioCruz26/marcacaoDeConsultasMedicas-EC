@@ -75,4 +75,4 @@ const TimeText = styled.Text<StyledProps>`
   color: ${(props: StyledProps) => props.isSelected ? theme.colors.primary : theme.colors.text};
 `;
 
-export default TimeSlotList;
+export default TimeSlotList; 

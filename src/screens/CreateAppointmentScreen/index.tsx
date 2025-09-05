@@ -1,41 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components/native';
 import { ScrollView, ViewStyle } from 'react-native';
 import { Button, Input } from 'react-native-elements';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
-import theme from '../styles/theme';
-import Header from '../components/Header';
-import DoctorList from '../components/DoctorList';
-import TimeSlotList from '../components/TimeSlotList';
+import Header from '../../components/Header';
+import DoctorList from '../../components/DoctorList';
+import TimeSlotList from '../../components/TimeSlotList';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authApiService } from '../services/authApi';
-import { User } from '../types/auth';
 
-type CreateAppointmentScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'CreateAppointment'>;
-};
+import {useloadDoctors} from './hooks/useloadDoctors';
+import {useconvertUsersToDoctors} from './hooks/useconvertUsersToDoctors';
+import {styles, Container, Title, SectionTitle, ErrorText} from './styles'
+import {CreateAppointmentScreenProps} from './types/types'
+import {Appointment, Doctor} from './interfaces/interfaces'
+import { User } from '../../types/auth';
 
-interface Appointment {
-  id: string;
-  patientId: string;
-  patientName: string;
-  doctorId: string;
-  doctorName: string;
-  date: string;
-  time: string;
-  specialty: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-}
-
-interface Doctor {
-  id: string;
-  name: string;
-  specialty: string;
-  image: string;
-}
 
 // Médicos agora vêm da API através do AppointmentForm
 
@@ -46,53 +25,14 @@ const CreateAppointmentScreen: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  // Estados para dados da API
-  const [doctors, setDoctors] = useState<User[]>([]);
   const [loadingDoctors, setLoadingDoctors] = useState(true);
+  const [doctors, setDoctors] = useState<User[]>([]);
+  const [error, setError] = useState('');
 
   // Carrega médicos ao montar o componente
   useEffect(() => {
-    loadDoctors();
+    useloadDoctors();
   }, []);
-
-  const loadDoctors = async () => {
-    try {
-      setLoadingDoctors(true);
-      setError(''); // Limpa erros anteriores
-      const doctorsData = await authApiService.getAllDoctors();
-      setDoctors(doctorsData);
-      console.log(`${doctorsData.length} médicos carregados com sucesso`);
-    } catch (error) {
-      console.error('Erro ao carregar médicos:', error);
-      setError('Carregando médicos com dados locais...');
-      // Tentativa adicional com pequeno delay
-      setTimeout(async () => {
-        try {
-          const doctorsData = await authApiService.getAllDoctors();
-          setDoctors(doctorsData);
-          setError('');
-        } catch (retryError) {
-          setError('Médicos carregados com dados locais (API indisponível)');
-        }
-      }, 1000);
-    } finally {
-      setLoadingDoctors(false);
-    }
-  };
-
-  // Converte User[] para Doctor[]
-  const convertUsersToDoctors = (users: User[]): Doctor[] => {
-    return users.map(user => ({
-      id: user.id,
-      name: user.name,
-      specialty: user.role === 'doctor' && 'specialty' in user 
-        ? user.specialty 
-        : 'Especialidade não informada',
-      image: user.image
-    }));
-  };
 
   const handleCreateAppointment = async () => {
     try {
@@ -161,7 +101,7 @@ const CreateAppointmentScreen: React.FC = () => {
           <ErrorText>Carregando médicos...</ErrorText>
         ) : (
           <DoctorList
-            doctors={convertUsersToDoctors(doctors)}
+            doctors={useconvertUsersToDoctors(doctors)}
             onSelectDoctor={setSelectedDoctor}
             selectedDoctorId={selectedDoctor?.id}
           />
@@ -187,53 +127,5 @@ const CreateAppointmentScreen: React.FC = () => {
     </Container>
   );
 };
-
-const styles = {
-  scrollContent: {
-    padding: 20,
-  },
-  input: {
-    marginBottom: 15,
-  },
-  button: {
-    marginTop: 10,
-    width: '100%',
-  },
-  buttonStyle: {
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 12,
-  },
-  cancelButton: {
-    backgroundColor: theme.colors.secondary,
-    paddingVertical: 12,
-  },
-};
-
-const Container = styled.View`
-  flex: 1;
-  background-color: ${theme.colors.background};
-`;
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 20px;
-  text-align: center;
-`;
-
-const SectionTitle = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: ${theme.colors.text};
-  margin-bottom: 10px;
-  margin-top: 10px;
-`;
-
-const ErrorText = styled.Text`
-  color: ${theme.colors.error};
-  text-align: center;
-  margin-bottom: 10px;
-`;
 
 export default CreateAppointmentScreen;
